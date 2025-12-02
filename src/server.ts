@@ -75,7 +75,7 @@ try{
     );
     // console.log(result.rows[0]);
 
- res.status(200).json({
+ res.status(201).json({
         success:true,
         message : "User created successfully",
         data : result.rows[0]
@@ -89,10 +89,55 @@ try{
     })
 }
 
-    res.status(201).json({
+})
+
+app.get("/users" ,async (req:Request,res:Response)=>{
+try{
+
+    const result = await pool.query(`SELECT * FROM users`);
+    res.status(200).json({
         success : true,
-        message : "API is working"
+        message : "We got All User",
+        data : result.rows
+
     })
+
+}catch(err:any){
+
+    res.status(500).json({
+        success:false,
+        message : err.message,
+        details :err
+    })
+
+}
+})
+
+app.get("/users/:id", async (req:Request,res:Response)=>{
+    // console.log(req.params.id)
+    try{
+
+        const result = await pool.query(`SELECT * FROM users WHERE id = $1`,[req.params.id])
+        if (result.rows.length === 0){
+            res.status(404).json({
+                success : false,
+                message : "User not found "
+            })
+        }else{
+            res.status(200).json({
+                success : true,
+                message : "User found  ",
+                data : result.rows[0]
+            })
+
+        }
+
+
+
+        console.log(result.rows)
+    }catch(err:any){
+
+    }
 })
 
 app.listen(port, () => {
